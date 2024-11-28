@@ -1,0 +1,117 @@
+/* General body styling */
+body {
+    font-family: Arial, sans-serif;
+    width: 500px; /* Increased width to fit more content */
+    height: 600px; /* Increased height to show at least 10 rows */
+    padding: 10px;
+    background-color: #f9f9f9;
+    color: #333;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+h1 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    text-align: center;
+    color: #4a90e2;
+}
+
+/* Button styling */
+button {
+    margin: 5px 5px 10px 0;
+    padding: 8px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+button:hover {
+    background-color: #e2e6ea;
+    border-color: #b5b5b5;
+}
+
+button:active {
+    background-color: #d6d6d6;
+    border-color: #a1a1a1;
+}
+
+button:disabled {
+    background-color: #f5f5f5;
+    color: #aaa;
+    border-color: #ddd;
+    cursor: not-allowed;
+}
+
+/* Feedback message styling */
+.feedback-message {
+    font-size: 14px;
+    color: green;
+    text-align: center;
+    margin-bottom: 10px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+/* Table container styling with scrollbars */
+.table-container {
+    max-width: 100%;       /* Stretches to fill container width */
+    max-height: 450px;     /* Allows space for at least 10 rows */
+    overflow-x: auto;      /* Enables horizontal scrolling */
+    overflow-y: auto;      /* Enables vertical scrolling */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    padding: 5px;          /* Adds spacing around table content */
+}
+
+/* Table styling */
+table {
+    width: 100%;           /* Stretches table within container */
+    min-width: 800px;      /* Forces horizontal scrolling for smaller viewports */
+    border-collapse: collapse;
+    white-space: nowrap;   /* Prevents text wrapping in cells */
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;      /* Aligns text to the left */
+    border-bottom: 1px solid #ddd;
+    color: #000;           /* Ensures all text is black */
+}
+
+thead {
+    background-color: #4a90e2;
+    color: white;
+}
+
+tbody {
+    font-size: 14px;
+    color: #333;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Removes bottom borders for the last row */
+tr:last-child td {
+    border-bottom: none;
+}
+
+/* Empty and loading state styling */
+#textList td {
+    text-align: left;
+    color: #999;
+    font-style: italic;
+    padding: 20px 0;
+}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Text Info</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Text Info</h1>
+        <div class="button-container">
+            <button id="clearButton">Clear List</button>
+            <button id="exportButton">Export to CSV</button>
+        </div>
+        <div id="feedbackMessage" class="feedback-message"></div>
+        <div class="table-container">
+            <table id="textTable">
+                <thead>
+                    <tr>
+                        <th>Text</th>
+                        <th>Font Size</th>
+                        <th>Font Family</th>
+                        <th>Font Weight</th>
+                        <th>Line Height</th>
+                        <th>Color</th>
+                    </tr>
+                </thead>
+                <tbody id="textList">
+                    <tr>
+                        <td colspan="6">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>
