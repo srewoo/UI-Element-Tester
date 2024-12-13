@@ -1,16 +1,16 @@
 {
   "manifest_version": 3,
-  "name": "Text/font/size Tracker for MindTickle",
-  "version": "1.0",
-  "description": "Tracks Text/font/size info on MindTickle.com",
+  "name": "Text/Font/Size Tracker for MindTickle",
+  "version": "1.1",
+  "description": "Tracks Text/Font/Size information on MindTickle pages.",
   "permissions": ["storage"],
-  "host_permissions": ["*://*.mindtickle.com/*"],
+  "host_permissions": ["https://*.mindtickle.com/*"], 
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["*://*.mindtickle.com/*"],
+      "matches": ["https://*.mindtickle.com/*"],
       "js": ["content.js"]
     }
   ],

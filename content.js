@@ -1,66 +1,102 @@
 console.log("Content script injected successfully!");
 
-// Capture console errors
-const originalConsoleError = console.error;
-console.error = function(...args) {
-    originalConsoleError.apply(console, args);
-    const errorMessage = args.map(arg => String(arg)).join(' ');
-    chrome.runtime.sendMessage({
-        action: "logConsoleError",
-        error: errorMessage
-    });
-};
+// Use the universal selector to capture all elements
+const SELECTORS = ["*"];
 
-// Get text info for all relevant elements
 function getTextInfo() {
-    const elements = document.querySelectorAll('button, div, span, li, a, p, h1, h2, h3, h4, h5, h6, label, input, textarea'); // Include more relevant elements
-    const textInfo = [];
+  console.log("Scanning elements for text and style information...");
 
-    elements.forEach((element) => {
-        const computedStyle = window.getComputedStyle(element);
-        const textContent = element.innerText.trim();
+  // Query all elements on the page
+  const elements = document.querySelectorAll(SELECTORS.join(","));
+  const textInfo = [];
 
-        // Filter out elements with no visible text
-        if (textContent && textContent !== "Loading..." && !textContent.includes("placeholder")) {
-            const fontSize = computedStyle.fontSize;
-            const fontFamily = computedStyle.fontFamily;
-            const fontWeight = computedStyle.fontWeight;
-            const lineHeight = computedStyle.lineHeight;
-            const color = computedStyle.color;
+  elements.forEach((element, index) => {
+    try {
+      const computedStyle = window.getComputedStyle(element);
+      const textContent = element.innerText?.trim() || "";
 
-            textInfo.push({
-                textContent: textContent,
-                fontSize: fontSize,
-                fontFamily: fontFamily,
-                fontWeight: fontWeight,
-                lineHeight: lineHeight,
-                color: color
-            });
-        }
-    });
+      // Filter out elements without meaningful content or those not visible
+      if (
+        textContent &&
+        computedStyle.display !== "none" &&
+        computedStyle.opacity !== "0"
+      ) {
+        textInfo.push({
+          textContent,
+          fontSize: computedStyle.fontSize || "N/A",
+          fontFamily: computedStyle.fontFamily || "N/A",
+          fontWeight: computedStyle.fontWeight || "N/A",
+          lineHeight: computedStyle.lineHeight || "N/A",
+          color: computedStyle.color || "N/A",
+          selector: getCssSelector(element),
+        });
+      }
+    } catch (err) {
+      console.warn(`Error processing element at index ${index}:`, err);
+    }
+  });
 
-    // Send the array of text data to the background script
-    chrome.runtime.sendMessage({
-        action: "textInfo",
-        data: textInfo
-    });
+  // Store and send the collected text info
+  console.log(`Collected information for ${textInfo.length} elements.`);
+  chrome.storage.local.set({ textInfo }, () => {
+    console.log("Data saved to chrome.storage.local.");
+  });
+  chrome.runtime.sendMessage(
+    { action: "textInfo", data: textInfo },
+    (response) => {
+      if (chrome.runtime.lastError) {
+        console.warn("Error sending message:", chrome.runtime.lastError);
+      } else {
+        console.log("Message sent successfully.");
+      }
+    }
+  );
 }
 
-// Observe DOM changes for dynamically added/changed content
+function getCssSelector(element) {
+  try {
+    const path = [];
+    while (element && element.nodeType === Node.ELEMENT_NODE) {
+      let selector = element.nodeName.toLowerCase();
+      if (element.id) {
+        selector += `#${element.id}`;
+        path.unshift(selector);
+        break;
+      } else {
+        let sib = element,
+          nth = 1;
+        while ((sib = sib.previousElementSibling)) nth++;
+        selector += `:nth-child(${nth})`;
+      }
+      path.unshift(selector);
+      element = element.parentNode;
+    }
+    return path.join(" > ");
+  } catch (err) {
+    console.error("Error generating CSS selector:", err);
+    return "N/A";
+  }
+}
+
+// Set up a mutation observer to watch for DOM changes
 const observer = new MutationObserver(() => {
-    getTextInfo(); // Re-run text extraction on DOM changes
-});
-
-// Start observing the document body for changes in child elements and subtree
-observer.observe(document.body, {
-    childList: true, // Observe when new elements are added/removed
-    subtree: true,   // Observe changes in all descendant nodes
-    characterData: true // Observe changes to text content directly
-});
-
-// Run getTextInfo on initial load
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', getTextInfo);
-} else {
+  if (debounceTimer) clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    console.log("DOM changed, rescanning...");
     getTextInfo();
+  }, 300);
+});
+
+let debounceTimer;
+observer.observe(document.body, { childList: true, subtree: true });
+
+// Run the function on initial load
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => {
+    console.log("DOMContentLoaded event fired.");
+    getTextInfo();
+  });
+} else {
+  console.log("Document ready, scanning immediately.");
+  getTextInfo();
 }
